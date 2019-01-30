@@ -14,3 +14,5 @@ redis 中查询秒杀到的商品，如果存在则为重复秒杀
 需要配置：redis  rabbitMQ  mysql
 框架技术： SpringBoot thymeleaf  Redis RabbitMQ
 
+rabbitTemplate.convertAndSend(MQConfig.MIAOSHATEST,msg)
+RedisService.beanToString(MiaoshaMessage mm)，通过 JSON.toJSONString(T t)方式
