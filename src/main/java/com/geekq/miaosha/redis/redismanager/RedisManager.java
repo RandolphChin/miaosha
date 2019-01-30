@@ -12,7 +12,8 @@ public class RedisManager {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxWaitMillis(20);
         jedisPoolConfig.setMaxIdle(10);
-        jedisPool = new JedisPool(jedisPoolConfig,"39.107.245.253");
+        // 10.1.225.47为部署 redis 服务器的 ip
+        jedisPool = new JedisPool(jedisPoolConfig,"10.1.225.47");
     }
 
     public static Jedis getJedis() throws Exception{

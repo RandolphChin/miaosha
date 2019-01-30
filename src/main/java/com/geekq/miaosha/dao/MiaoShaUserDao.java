@@ -2,6 +2,7 @@ package com.geekq.miaosha.dao;
 
 import com.geekq.miaosha.domain.MiaoshaUser;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Service;
 
 @Mapper
 public interface MiaoShaUserDao {

@@ -199,7 +199,7 @@ public class MiaoshaController implements InitializingBean {
         }
     }
     /**
-     * 系统初始化
+     * 系统初始化  bean 的初始化过程步骤之一
      *
      * @throws Exception
      */

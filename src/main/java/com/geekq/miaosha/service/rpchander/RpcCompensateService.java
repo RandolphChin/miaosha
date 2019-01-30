@@ -2,6 +2,7 @@ package com.geekq.miaosha.service.rpchander;
 
 import com.geekq.miaosha.common.SnowflakeIdWorker;
 import com.geekq.miaosha.common.resultbean.ResultGeekQ;
+import com.geekq.miaosha.mybatis.vo.TeacherVo;
 import com.geekq.miaosha.service.rpchander.enums.PlanStepStatus;
 import com.geekq.miaosha.service.rpchander.enums.PlanStepType;
 import com.geekq.miaosha.service.rpchander.vo.HandlerParam;
