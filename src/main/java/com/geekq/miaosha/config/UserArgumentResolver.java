@@ -19,6 +19,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
       Class<?> clazz =    methodParameter.getParameterType() ;
+       boolean blo = MiaoshaUser.class.isAssignableFrom(clazz);
       return clazz == MiaoshaUser.class ;
     }
 
@@ -27,6 +28,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         /**
          *  threadlocal 存储线程副本 保证线程不冲突
          */
+        MiaoshaUser obj = UserContext.getUser();
         return UserContext.getUser();
     }
 

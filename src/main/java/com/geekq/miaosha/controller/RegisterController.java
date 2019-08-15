@@ -29,6 +29,7 @@ public class RegisterController {
     private MiaoshaService miaoshaService ;
     @RequestMapping("/do_register")
     public String registerIndex(){
+        System.out.println("enter register page");
         return "register";
     }
 

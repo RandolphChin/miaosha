@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-	<script type="text/javascript" th:src="@{/js/common1.js}"></script>
-	<script type="text/javascript" th:src="@{/js/common.js}"></script>
-	<script type="text/javascript" th:src="@{/js/jquery.min.js}" ></script>
-	<script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+<head> <!-- jquery -->
+	<script type="text/javascript" src="../static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="../static/js/common1.js"></script>
+	<script type="text/javascript" src="../static/js/common.js"></script>
+	<script type="text/javascript" src="../static/js/jquery.min.js" ></script>
+	<script type="text/javascript" src="../static/layer/layer.js"></script>
 	<!-- md5.js -->
-	<script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+	<script type="text/javascript" src="../static/js/md5.min.js"></script>
 		<meta charset="utf-8" />
 		<title>注册界面</title>
-		<link rel="stylesheet" th:href="@{/css/reset.css}" />
-		<link rel="stylesheet" th:href="@{/css/common.css}" />
-		<link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" />
+		<link rel="stylesheet" href="../static/css/reset.css" />
+		<link rel="stylesheet" href="../static/css/common.css" />
+		<link rel="stylesheet" href="../static/css/font-awesome.min.css" />
 <script>
     $(function() {// 初始化内容
         $("#verifyCodeImg").attr("src", "/miaosha/verifyCodeRegister");

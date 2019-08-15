@@ -19,7 +19,7 @@ public class RedisLua {
      * 未完成  需 evalsha更方便 限制ip 或者 手机号访问次数
      */
     public static void getLuaLimit() {
-
+/*
         Jedis jedis = null;
         try {
             jedis = RedisManager.getJedis();
@@ -42,7 +42,7 @@ public class RedisLua {
         String luaScript = jedis.scriptLoad(lua);
         System.out.println(luaScript);
         Object object = jedis.evalsha(luaScript, keys, argves);
-        System.out.println(object);
+        System.out.println(object);*/
     }
 
     /**
@@ -52,7 +52,7 @@ public class RedisLua {
 
         Jedis jedis = null;
         Object object = null;
-        try {
+     /*   try {
             jedis = RedisManager.getJedis();
 
         String count =
@@ -67,7 +67,7 @@ public class RedisLua {
         } catch (Exception e) {
             logger.error("统计访问次数失败！！！",e);
             return "0";
-        }
+        }*/
         return  object;
     }
 
@@ -75,7 +75,7 @@ public class RedisLua {
      * 统计访问次数
      */
     public static void vistorCount(String key) {
-
+/*
         Jedis jedis = null;
         Object object = null;
         try {
@@ -91,6 +91,6 @@ public class RedisLua {
             jedis.evalsha(luaScript, keys, argves);
         } catch (Exception e) {
             logger.error("统计访问次数失败！！！",e);
-        }
+        }*/
     }
 }

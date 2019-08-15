@@ -71,7 +71,7 @@ public class DruidConfig {
 	        }
 	        return datasource;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}

@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +42,7 @@ public class BaseController {
             return null;
         }
         //手动渲染
-        WebContext ctx = new WebContext(request,response,
+        IWebContext ctx = new WebContext(request,response,
                 request.getServletContext(),request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process(tplName, ctx);
         if(!StringUtils.isEmpty(html)) {

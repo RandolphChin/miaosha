@@ -4,26 +4,26 @@
     <title>商品详情</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <!-- jquery -->
-    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery.min.js"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
-    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="../static/bootstrap/js/bootstrap.min.js"></script>
     <!-- jquery-validator -->
-    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
-    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <script type="text/javascript" src="../static/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="../static/jquery-validation/localization/messages_zh.min.js"></script>
     <!-- layer -->
-    <script type="text/javascript" src="/layer/layer.js"></script>
+    <script type="text/javascript" src="../static/layer/layer.js"></script>
     <!-- md5.js -->
-    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <script type="text/javascript" src="../static/js/md5.min.js"></script>
     <!-- common.js -->
-    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="../static/js/common.js"></script>
     <style type="text/css">
         html,body{
             height:100%;
             width:100%;
         }
         body{
-            background:url('/img/bg2.jpg') no-repeat;
+            background:url('../static/img/bg2.jpg') no-repeat;
             background-size:100% 100%;
         }
         #goodslist td{
@@ -99,11 +99,13 @@ function getMiaoshaPath(){
 			verifyCode:$("#verifyCode").val()
 		},
 		success:function(data){
+            debugger;
 			if(data.code == 0){
 				var path = data.data;
 				doMiaosha(path);
 			}else{
-				layer.msg(data.msg);
+                var message = data.message;
+				layer.msg(message);
 			}
 		},
 		error:function(){
@@ -132,17 +134,19 @@ function getMiaoshaResult(goodsId){
 				}else{
 					layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
 							function(){
-								window.location.href="/order_detail.htm?orderId="+result;
+								window.location.href="../static/order_detail.htm?orderId="+result;
 							},
 							function(){
 								layer.closeAll();
 							});
 				}
 			}else{
+                console.log("goes wrong");
 				layer.msg(data.msg);
 			}
 		},
 		error:function(){
+            console.log("went wrong");
 			layer.msg("客户端请求有误");
 		}
 	});
@@ -160,7 +164,8 @@ function doMiaosha(path){
 				//window.location.href="/order_detail.htm?orderId="+data.data.id;
 				getMiaoshaResult($("#goodsId").val());
 			}else{
-				layer.msg(data.msg);
+                console.log("go wrong");
+				layer.msg(data.message);
 			}
 		},
 		error:function(){

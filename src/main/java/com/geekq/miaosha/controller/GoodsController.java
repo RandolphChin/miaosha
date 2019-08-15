@@ -18,8 +18,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.thymeleaf.spring4.context.SpringWebContext;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.context.IWebContext;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,11 +53,11 @@ public class GoodsController extends BaseController {
      * QPS:2884, load:5
      * */
     @RequestMapping(value="/to_list", produces="text/html")
-    @ResponseBody
     public String list(HttpServletRequest request, HttpServletResponse response, Model model, MiaoshaUser user) {
         model.addAttribute("user", user);
         List<GoodsVo> goodsList = goodsService.listGoodsVo();
         model.addAttribute("goodsList", goodsList);
+        // html 放入 redis 设置时间 60秒
         return render(request,response,model,"goods_list",GoodsKey.getGoodsList,"");
     }
 
@@ -94,9 +96,10 @@ public class GoodsController extends BaseController {
         model.addAttribute("remainSeconds", remainSeconds);
 //        return "goods_detail";
 
-        SpringWebContext ctx = new SpringWebContext(request,response,
-                request.getServletContext(),request.getLocale(), model.asMap(), applicationContext );
+        IWebContext ctx = new WebContext(request,response,
+                request.getServletContext(),request.getLocale(), model.asMap() );
         html = viewResolver.getTemplateEngine().process("goods_detail", ctx);
+        // 为了优化访问速度，应对高并发，想把页面信息全部获取出来存到redis缓存中，这样每次访问就不用客户端进行渲染了
         if(!StringUtils.isEmpty(html)) {
             redisService.set(GoodsKey.getGoodsDetail, ""+goodsId, html);
         }

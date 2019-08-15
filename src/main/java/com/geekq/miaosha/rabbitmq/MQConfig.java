@@ -16,6 +16,7 @@ public class MQConfig {
 	 */
 	public static final String MIAOSHA_QUEUE = "miaosha.queue";
 
+	public static final String EXCHANGE_QUEUE = "exchange_queue";
 	public static final String EXCHANGE_TOPIC = "exchange_topic";
 
 	public static final String MIAOSHA_MESSAGE = "miaosha_mess";
@@ -35,9 +36,16 @@ public class MQConfig {
 	 * */
 	@Bean
 	public Queue queue() {
-		return new Queue(QUEUE, true);
+		return new Queue(MIAOSHA_QUEUE, true,false,false);
 	}
-	
+	@Bean
+	public DirectExchange directMiaoSha(){
+		return  new DirectExchange(EXCHANGE_QUEUE,true,false);
+	}
+	@Bean
+	public Binding  bindMiaoSha(){
+		return BindingBuilder.bind(queue()).to(directMiaoSha()).with("miaosha.good");
+	}
 	/**
 	 * Topic模式 交换机Exchange
 	 * */

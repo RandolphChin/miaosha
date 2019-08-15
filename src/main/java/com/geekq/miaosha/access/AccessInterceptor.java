@@ -47,7 +47,10 @@ public class AccessInterceptor  extends HandlerInterceptorAdapter{
 //			if(hm.getMethod().getName().startsWith("test")){
 //				return true;
 //			}
+
+
 			MiaoshaUser user = getUser(request, response);
+			// 往ThreadLocal中填充的变量属于当前线程，该变量对其他线程而言是隔离的
 			UserContext.setUser(user);
 			AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
 			if(accessLimit == null) {
