@@ -1,13 +1,4 @@
 此 project 为[qiurunze123](https://github.com/qiurunze123/miaosha) 秒杀系统的原始版本springboot 1的基础上升级为 springboot2
-##### 秒杀时步骤
-1. 检查核验验证码
-redis中获取是否有有时效期限的校验码。 没有：直接返回false   ； 有：删除redis中的校验码，返回 true
-2. 设置 redis MiaoshaPath
-redis中设置具有时效期限的 MiaoshaPath，key格式为 nickName_goodId，value为md5加密的uuid，返回 value 值
-3. 校验秒杀到的商品
-redis 中查询秒杀到的商品，如果存在则为重复秒杀
-4. redis 预减库存
-5. 商品和个人信息发送到 MQ
 
 ##### 基本信息
 入口：http://localhost:8080/login/do_login
@@ -110,3 +101,50 @@ localOverMap.put(goods.getId(), false);
 ```
 #### 商品列表展示
 后台查询出商品列表放入 Model 中，生成 html 字符串放入 redis 设置有效期时间 60秒
+前台查询时会先从 redis 中获取，没有获取到则会手动渲染到指定视图
+```
+示例： BaseController.java 中的部分
+IWebContext ctx = new WebContext(request,response,request.getServletContext(),request.getLocale(), model.asMap());
+String  html = thymeleafViewResolver.getTemplateEngine().process(tplName, ctx);
+OutputStream 输出 html        
+```
+#### 商品详情
+Thymeleaf 中的 th:href 也可以跳转至指定的 html 页面，通过 ajax 加载数据
+>th:href="'../static/goods_detail.htm?goodsId='+${goods.id}"
+
+1. 由商品列表，点击"详情"按钮跳转至详情 html 页面
+2. 异步请求加载商品详情
+3. 秒杀剩余时间大于0时，使秒杀按钮灰色无法点击，开始一个JavaScript的倒计时，验证码显示隐藏
+4. 秒杀剩余时间等于0时，使秒杀按钮可以点击，清除倒计时标识，请求后台获取页面验证码，验证码显示
+5. 秒杀剩余时间小于0时，使秒杀按钮灰色无法点击，验证码隐藏不显示
+
+#### 商品秒杀
+Spring 初始化时:
+````
+1 把每种商品的库存数量存入 redis 中,key为商品ID,value为商品库存;
+2 内存标记localOverMap变量(HashMap<Long, Boolean> localOverMap) key为把商品ID,value为 false,存入redis作为库存标记变量
+````
+1. 填写验证码，点击"商品秒杀"按钮，异步get请求参数商品ID和验证码,请求方法A
+2. 后台先检验用户是否登录，未登录报错
+3. 从 redis 中获取验证码，对比前台参数，如果不同则抛出异常报错，如果相同则 redis 删除该验证码
+4. 随机生成一个path，放入 redis中，设置过期时间，返回该 path 给前台
+5. 前台根据返回的随机生成的path,异步post请求参数商品ID,请求另一个方法B
+6. 后台先检验用户是否登录，未登录报错
+7. 从 redis 中获取之前方法A生成的验证码，对比前台参数，如果不同则抛出异常报错
+8. 根据用户信息和商品ID从 redis中查询是否已经存在秒杀订单MiaoshaOrder,表示已经秒杀过了,如果存在则,返回抛出异步(防止重复秒杀)
+9. 如果 redis 中不存在该用户的秒杀订单,则先检查该商品是否有库存(内存标记 localOverMap.get(goodsId);)
+10. 如果内存标记 localOverMap 根据该商品ID 获取的值为 true,则表示没有库存则抛出异常
+11. 如果有库存,则 redis 预减库存数量 1,得到 redis中减去1之后的商品的库存数量
+12. 检查库存数量,如果小于0,则更改商品的内存标记为 true ,并抛出异常报错
+13. 构造订单对象,发送给MQ
+14. MQ接收者接收订单对象，从中取出用户和商品ID，从数据库查询出商品库存数量 ,如果小于等于0则返回
+15. 继续根据用户信息和商品ID从 redis中查询是否已经存在秒杀订单MiaoshaOrder,表示已经秒杀过了,如果存在则返回,不抛出异常
+16. 根据商品ID从数据库更新商品数量，减少1，返回更新是否成功标识
+17. 如果返回成功，则 insert 创建订单信息，秒杀订单MiaoshaOrder信息放入 redis中
+18. 如果返回失败，则 redis 中设置商品秒杀失败标识key goodOver
+
+#### 查看秒杀请求参数商品ID
+1. 根据商品ID和用户信息从 redis 中查询出秒杀订单MiaoshaOrder
+2. 如果订单不为空则秒杀成功
+3. 如果订单为空,redis 中判断商品秒杀失败标识key 是否存在
+4. 如果存在则秒杀失败，返回-1；否则返回 0，让客户端重新发起查看秒杀请求
