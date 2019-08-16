@@ -50,7 +50,7 @@ public class OrderCloseTask {
     public void closeOrderTaskV3(){
         log.info("关闭订单定时任务启动");
         long lockTime = 5000;
-        Long setnxResult = redisService.setnx(CLOSE_ORDER_INFO_TASK_LOCK,String.valueOf(System.currentTimeMillis()+lockTime));
+        Integer setnxResult = redisService.setnx(CLOSE_ORDER_INFO_TASK_LOCK,String.valueOf(System.currentTimeMillis()+lockTime));
         //代表获取了锁
         if(setnxResult !=null && setnxResult ==1){
             closeOrder(CLOSE_ORDER_INFO_TASK_LOCK);
