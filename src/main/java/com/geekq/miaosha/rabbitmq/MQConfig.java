@@ -46,6 +46,14 @@ public class MQConfig {
 	public Binding  bindMiaoSha(){
 		return BindingBuilder.bind(queue()).to(directMiaoSha()).with("miaosha.good");
 	}
+	@Bean
+	public Queue queueMsg() {
+		return new Queue(MIAOSHATEST, true,false,false);
+	}
+	@Bean
+	public Binding  bindMiaoShaMsg(){
+		return BindingBuilder.bind(queueMsg()).to(directMiaoSha()).with("miaosha.msg");
+	}
 	/**
 	 * Topic模式 交换机Exchange
 	 * */

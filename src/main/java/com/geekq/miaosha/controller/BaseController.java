@@ -53,6 +53,7 @@ public class BaseController {
     }
 
     public static void out(HttpServletResponse res, String html){
+        // 告诉浏览器响应内容为html类型，编码为utf-8
         res.setContentType("text/html");
         res.setCharacterEncoding("UTF-8");
         try{

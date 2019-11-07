@@ -11,6 +11,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+/**
+ * HandlerMethodArgumentResolver是一个参数解析器，可以通过写一个类实现HandlerMethodArgumentResolver接口来实现对Controller层中方法请求参数的赋值修改
+ */
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 

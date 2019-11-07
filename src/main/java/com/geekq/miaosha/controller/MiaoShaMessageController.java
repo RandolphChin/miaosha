@@ -25,7 +25,8 @@ public class MiaoShaMessageController {
     @Autowired
     private MQSender sendMessage;
 
-    @RequestMapping(value = "/list", produces = "text/html")
+    // @RequestMapping(value = "/list", produces = "text/html")
+    @RequestMapping(value = "/list")
     public String list(@RequestParam(value = "userid",required= true) String userId, Model model) {
         ResultGeekQ resultGeekQ = ResultGeekQ.build();
         if (StringUtils.isBlank(userId)) {

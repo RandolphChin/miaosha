@@ -1,9 +1,14 @@
 此 project 为[qiurunze123](https://github.com/qiurunze123/miaosha) 秒杀系统的原始版本springboot 1的基础上升级为 springboot2
-
+看点：
+1. rabbitMQ异步创建订单
+2. HandlerMethodArgumentResolver参数解析器
+3. 利用redis控流
+4. 秒杀流程逻辑
 ##### 基本信息
-入口：http://localhost:8080/login/do_login
+入口：http://localhost:8080/login/to_login
 需要配置：redis  rabbitMQ  mysql
 框架技术： SpringBoot thymeleaf  Redis RabbitMQ
+使用RabbitMQ 生产者redis库存预减1，redis查看订单是否存在，消费者实现库存数量减少1，成功后创建秒杀订单并写入redis
 #### GoodsController.java
 ```
 import org.thymeleaf.spring4.context.SpringWebContext;
@@ -82,6 +87,7 @@ public @interface AccessLimit {
 2 登录页面
 ```
 2.1 异步提交登录信息
+2.2 自定义注解@MobileCheck校验form表单参数中的手机用户名的有效性
 2.2 根据用户名从数据库查询出用户,如果为空，统一异常报用户不存在
 2.3 参数密码进行加密后与用户中的密码对比是否相同
 2.4 生成 cookie， cookie设置有效期和 redis 一致, response中添加 cookie
@@ -89,6 +95,7 @@ public @interface AccessLimit {
 2.6 ajax回调函数中跳转至其他页面
 ```
 #### 拦截器 AccessInterceptor.java
+应用于分布式系统中以cookie为key，从 redis获取登录用户信息
 1 从 request 中获取 cookie，以 cookie为 key 从 redis 中获取用户对象
 2 对象 set 到 ThreadLocal中
 3 判断是否方法中添加注解 @AccessLimit
@@ -100,7 +107,7 @@ redisService.set(GoodsKey.getMiaoshaGoodsStock, "" + goods.getId(), goods.getSto
 localOverMap.put(goods.getId(), false);
 ```
 #### 商品列表展示
-后台查询出商品列表放入 Model 中，生成 html 字符串放入 redis 设置有效期时间 60秒
+后台数据库查询出商品列表放入 Model 中，生成 html 字符串放入 redis 设置有效期时间 60秒
 前台查询时会先从 redis 中获取，没有获取到则会手动渲染到指定视图
 ```
 示例： BaseController.java 中的部分
@@ -113,7 +120,7 @@ Thymeleaf 中的 th:href 也可以跳转至指定的 html 页面，通过 ajax �
 >th:href="'../static/goods_detail.htm?goodsId='+${goods.id}"
 
 1. 由商品列表，点击"详情"按钮跳转至详情 html 页面
-2. 异步请求加载商品详情
+2. 异步请求数据库加载商品详情
 3. 秒杀剩余时间大于0时，使秒杀按钮灰色无法点击，开始一个JavaScript的倒计时，验证码显示隐藏
 4. 秒杀剩余时间等于0时，使秒杀按钮可以点击，清除倒计时标识，请求后台获取页面验证码，验证码显示
 5. 秒杀剩余时间小于0时，使秒杀按钮灰色无法点击，验证码隐藏不显示
@@ -130,7 +137,7 @@ Spring 初始化时:
 4. 随机生成一个path，放入 redis中，设置过期时间，返回该 path 给前台
 5. 前台根据返回的随机生成的path,异步post请求参数商品ID,请求另一个方法B
 6. 后台先检验用户是否登录，未登录报错
-7. 从 redis 中获取之前方法A生成的验证码，对比前台参数，如果不同则抛出异常报错
+7. 从 redis 中获取之前方法A生成的path，对比前台参数，如果不同则抛出异常报错
 8. 根据用户信息和商品ID从 redis中查询是否已经存在秒杀订单MiaoshaOrder,表示已经秒杀过了,如果存在则,返回抛出异步(防止重复秒杀)
 9. 如果 redis 中不存在该用户的秒杀订单,则先检查该商品是否有库存(内存标记 localOverMap.get(goodsId);)
 10. 如果内存标记 localOverMap 根据该商品ID 获取的值为 true,则表示没有库存则抛出异常
@@ -141,10 +148,14 @@ Spring 初始化时:
 15. 继续根据用户信息和商品ID从 redis中查询是否已经存在秒杀订单MiaoshaOrder,表示已经秒杀过了,如果存在则返回,不抛出异常
 16. 根据商品ID从数据库更新商品数量，减少1，返回更新是否成功标识
 17. 如果返回成功，则 insert 创建订单信息，秒杀订单MiaoshaOrder信息放入 redis中
-18. 如果返回失败，则 redis 中设置商品秒杀失败标识key goodOver
+18. 如果返回失败，则 redis 中设置商品秒杀库存为 0 标识key goodOver
 
 #### 查看秒杀请求参数商品ID
 1. 根据商品ID和用户信息从 redis 中查询出秒杀订单MiaoshaOrder
 2. 如果订单不为空则秒杀成功
-3. 如果订单为空,redis 中判断商品秒杀失败标识key 是否存在
+3. 如果订单为空,redis 中判断商品秒杀库存为 0 标识key goodOver是否存在
 4. 如果存在则秒杀失败，返回-1；否则返回 0，让客户端重新发起查看秒杀请求
+#### 参数解析器 HandlerMethodArgumentResolver
+HandlerMethodArgumentResolver是一个参数解析器，可以通过写一个类实现HandlerMethodArgumentResolver接口来实现对
+Controller层中方法请求参数的赋值修改
+见 UserArgumentResolver.java 的用法
