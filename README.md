@@ -8,7 +8,7 @@
 入口：http://localhost:8080/login/to_login
 需要配置：redis  rabbitMQ  mysql
 框架技术： SpringBoot thymeleaf  Redis RabbitMQ
-使用RabbitMQ 生产者redis库存预减1，redis查看订单是否存在，消费者实现库存数量减少1，成功后创建秒杀订单并写入redis
+使用RabbitMQ 生产者redis库存预减1，redis查看订单是否存在，消费者实现db库存数量减少1，成功后创建秒杀订单并写入redis
 #### GoodsController.java
 ```
 import org.thymeleaf.spring4.context.SpringWebContext;
@@ -159,3 +159,58 @@ Spring 初始化时:
 HandlerMethodArgumentResolver是一个参数解析器，可以通过写一个类实现HandlerMethodArgumentResolver接口来实现对
 Controller层中方法请求参数的赋值修改
 见 UserArgumentResolver.java 的用法
+
+执业药业继续教育系统是为上海市执业药师协会开发的，系统的目标群体是上海市从事药品流通经营的执业药师，
+执业药师每年都需要由执业药师进行一次资质认证，认证就是通过这个系统完成的
+这个系统设计的以下几个模块：注册登录模块、缴费模块、选课模块、签到系统、
+
+goods -->  courses
+miaosha_goods -->  prepare_courses
+miaosha_order -->  course_order
+order_info -->  order_info
+sign
+user
+school
+course_addr  上课地点
+
+courses 课程表字段
+```
+id  
+course_name  课程名称可能重复，但上课地点和上课时间会不同
+course_desc
+course_school(id) 课程所属学校，哪家学校上这门课程
+course_count  学习这门课程的学员报名上限数量
+course_year   课程开设年份
+course_addr(id)  授课地点
+teacher_name
+start_date    上课时间
+end_date       下课时间
+course_type    授课类型 面授、函授、网授
+status  课程状态
+```
+prepare_courses 待选课程表
+```
+id
+course_id(id)
+course_stock  学习这门课程的学员报名上限数量,伴随选课会减少
+start_date  开放选课时间
+end_date    结束选课时间
+status  课程状态
+```
+course_order 选课表
+```
+id
+user_id(id)
+course_id(id)
+order_id(id)
+```
+order_info 选课详情表
+```
+id
+user_id
+course_id
+course_count  选课数量
+create_date
+pay_date
+status
+```
